@@ -1,0 +1,51 @@
+function changeRole() {
+  const roleSelect = document.getElementById('role');
+  const roleDisplay = document.getElementById('currentRoleDisplay');
+  roleDisplay.textContent = roleSelect.options[roleSelect.selectedIndex].text;
+}
+
+function swipeCard(cardId, direction) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  
+  if (direction === 'left') {
+    card.classList.add('swipe-left');
+  } else {
+    card.classList.add('swipe-right');
+  }
+
+  setTimeout(() => {
+    card.remove();
+  }, 400);
+}
+
+let cardCount = 1;
+function addCard() {
+  cardCount++;
+  const container = document.getElementById('cardsContainer');
+  const roleSelect = document.getElementById('role');
+  const currentRole = roleSelect.options[roleSelect.selectedIndex].text;
+
+  const newCard = document.createElement('div');
+  newCard.className = 'card';
+  newCard.id = `card${cardCount}`;
+  newCard.innerHTML = `
+    <span class="badge">Nouvelle tâche</span>
+    <h3>Bloc de tâche #${cardCount}</h3>
+    <p>Rôle : <strong>${currentRole}</strong></p>
+    <div class="card-actions">
+      <button class="btn btn-swipe-left" onclick="swipeCard('card${cardCount}', 'left')">👈 Archiver</button>
+      <button class="btn btn-swipe-right" onclick="swipeCard('card${cardCount}', 'right')">Valider 👉</button>
+    </div>
+  `;
+  container.appendChild(newCard);
+}
+
+function toggleSettings() {
+  const modal = document.getElementById('settingsModal');
+  modal.classList.toggle('hidden');
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+}

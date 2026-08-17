@@ -1,0 +1,143 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f0f2f5;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  transition: background-color 0.3s;
+}
+
+body.dark-mode {
+  background-color: #1e1e2f;
+  color: #fff;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 500px;
+}
+
+body.dark-mode .app-container {
+  background: #2d2d44;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.role-selector select {
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-weight: bold;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card {
+  background: #f9f9f9;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  position: relative;
+}
+
+body.dark-mode .card {
+  background: #3b3b58;
+}
+
+.card.swipe-left {
+  transform: translateX(-120%) rotate(-10deg);
+  opacity: 0;
+}
+
+.card.swipe-right {
+  transform: translateX(120%) rotate(10deg);
+  opacity: 0;
+}
+
+.badge {
+  background: #ff5e57;
+  color: white;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-swipe-left { background: #ff7675; color: white; }
+.btn-swipe-right { background: #55efc4; color: #2d3436; }
+
+.app-footer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.btn-icon {
+  background: #0984e3;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  width: 80%;
+  max-width: 350px;
+  color: #333;
+}

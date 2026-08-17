@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamilyTask - Application Interactive</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>📋 FamilyTask</h1>
+      <div class="role-selector">
+        <label for="role">Rôle :</label>
+        <select id="role" onchange="changeRole()">
+          <option value="famille">👨‍👩‍👧‍👦 Famille</option>
+          <option value="devoirs">🎓 Devoirs / Études</option>
+          <option value="travail">💼 Travail</option>
+          <option value="vacances">🏖️ Vacances</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="cards-container" id="cardsContainer">
+        <div class="card" id="card1">
+          <span class="badge">Priorité</span>
+          <h3>Faire les courses de la semaine</h3>
+          <p>Organisé pour le rôle : <strong id="currentRoleDisplay">Famille</strong></p>
+          <div class="card-actions">
+            <button class="btn btn-swipe-left" onclick="swipeCard('card1', 'left')">👈 Archiver</button>
+            <button class="btn btn-swipe-right" onclick="swipeCard('card1', 'right')">Valider 👉</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <button class="btn-icon" onclick="addCard()">➕ Ajouter un bloc</button>
+      <button class="btn-icon" onclick="toggleSettings()">⚙️ Paramètres</button>
+    </footer>
+
+    <div id="settingsModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>⚙️ Paramètres</h2>
+        <p>Options de personnalisation de l'application :</p>
+        <label><input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()"> Mode Sombre</label>
+        <br><br>
+        <button class="btn" onclick="toggleSettings()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
