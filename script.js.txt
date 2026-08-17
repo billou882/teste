@@ -1,0 +1,235 @@
+// TES PROPRES CLÉS FIREBASE 🚀
+const firebaseConfig = {
+  apiKey: "AIzaSyDOZ4DiJtZxIm094SvZnDY_3hXXgdffaIg",
+  authDomain: "friends-app-357ce.firebaseapp.com",
+  databaseURL: "https://friends-app-357ce-default-rtdb.firebaseio.com",
+  projectId: "friends-app-357ce",
+  storageBucket: "friends-app-357ce.firebasestorage.app",
+  messagingSenderId: "670998384550",
+  appId: "1:670998384550:web:8392d717c2d56913008967",
+  measurementId: "G-0P6TEKR7W2"
+};
+
+// Initialisation de Firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+let currentRoom = 'general';
+
+// Navigation Onglets
+function switchPage(page) {
+  document.getElementById('pageMessages').classList.add('hidden');
+  document.getElementById('pageBeReal').classList.add('hidden');
+  document.getElementById('pageAmis').classList.add('hidden');
+
+  const buttons = document.querySelectorAll('.nav-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+
+  if (page === 'messages') {
+    document.getElementById('pageMessages').classList.remove('hidden');
+    document.getElementById('headerTitle').textContent = '💬 Chat & Jeux Duo';
+    buttons[0].classList.add('active');
+  } else if (page === 'bereal') {
+    document.getElementById('pageBeReal').classList.remove('hidden');
+    document.getElementById('headerTitle').textContent = '⚡ BeReal Friends';
+    buttons[1].classList.add('active');
+  } else if (page === 'amis') {
+    document.getElementById('pageAmis').classList.remove('hidden');
+    document.getElementById('headerTitle').textContent = '🤝 Amis & Permissions';
+    buttons[2].classList.add('active');
+  }
+}
+
+// CHAT EN TEMPS RÉEL (FIREBASE)
+function joinRoom() {
+  currentRoom = document.getElementById('roomInput').value || 'general';
+  document.getElementById('chatBox').innerHTML = `<div class="message received">Salon rejoint : ${currentRoom}</div>`;
+  listenToChat();
+}
+
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  if (input.value.trim() !== '') {
+    db.ref('rooms/' + currentRoom + '/messages').push({
+      sender: 'Moi',
+      text: input.value,
+      time: Date.now()
+    });
+    input.value = '';
+  }
+}
+
+function listenToChat() {
+  db.ref('rooms/' + currentRoom + '/messages').off();
+  db.ref('rooms/' + currentRoom + '/messages').on('child_added', (snapshot) => {
+    const msgData = snapshot.val();
+    const chatBox = document.getElementById('chatBox');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = msgData.sender === 'Moi' ? 'message sent' : 'message received';
+    msgDiv.textContent = msgData.text;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+}
+listenToChat();
+
+// JEUX TEMPS RÉEL
+let currentGame = 'morpion';
+
+function selectGame(game) {
+  currentGame = game;
+  document.getElementById('gameMorpion').classList.add('hidden');
+  document.getElementById('gameP4').classList.add('hidden');
+  document.getElementById('gameSnake').classList.add('hidden');
+
+  if(game === 'morpion') {
+    document.getElementById('gameMorpion').classList.remove('hidden');
+  } else if(game === 'p4') {
+    document.getElementById('gameP4').classList.remove('hidden');
+    initP4();
+  } else if(game === 'snake') {
+    document.getElementById('gameSnake').classList.remove('hidden');
+    startSnake();
+  }
+}
+
+// Morpion avec Firebase
+let morpionBoard = ['', '', '', '', '', '', '', '', ''];
+let morpionPlayer = 'X';
+
+function playMorpion(index) {
+  if (morpionBoard[index] === '') {
+    morpionBoard[index] = morpionPlayer;
+    document.querySelectorAll('#boardMorpion .cell')[index].textContent = morpionPlayer;
+    morpionPlayer = morpionPlayer === 'X' ? 'O' : 'X';
+    document.getElementById('gameStatus').textContent = `Tour du Joueur (${morpionPlayer})`;
+  }
+}
+
+// Puissance 4
+function initP4() {
+  const grid = document.getElementById('boardP4');
+  grid.innerHTML = '';
+  for(let i = 0; i < 42; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'p4-cell';
+    cell.onclick = () => cell.classList.toggle('red');
+    grid.appendChild(cell);
+  }
+}
+
+// SNAKE DUO
+let snakeCanvas, ctx, snakeInterval;
+let snake = [{x: 5, y: 5}];
+let food = {x: 8, y: 8};
+let dir = 'RIGHT';
+
+function startSnake() {
+  snakeCanvas = document.getElementById('snakeCanvas');
+  ctx = snakeCanvas.getContext('2d');
+  clearInterval(snakeInterval);
+  snake = [{x: 5, y: 5}];
+  dir = 'RIGHT';
+  snakeInterval = setInterval(updateSnake, 150);
+}
+
+function changeSnakeDir(newDir) {
+  dir = newDir;
+}
+
+function updateSnake() {
+  let head = {...snake[0]};
+  if(dir === 'UP') head.y--;
+  if(dir === 'DOWN') head.y++;
+  if(dir === 'LEFT') head.x--;
+  if(dir === 'RIGHT') head.x++;
+
+  snake.unshift(head);
+  if(head.x === food.x && head.y === food.y) {
+    food = {x: Math.floor(Math.random()*12), y: Math.floor(Math.random()*12)};
+  } else {
+    snake.pop();
+  }
+
+  // Canvas Drawing
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0, 240, 240);
+  
+  ctx.fillStyle = '#2ed573';
+  snake.forEach(s => ctx.fillRect(s.x*20, s.y*20, 18, 18));
+
+  ctx.fillStyle = '#ff4757';
+  ctx.fillRect(food.x*20, food.y*20, 18, 18);
+}
+
+function resetCurrentGame() {
+  if(currentGame === 'morpion') {
+    morpionBoard = ['', '', '', '', '', '', '', '', ''];
+    document.querySelectorAll('#boardMorpion .cell').forEach(c => c.textContent = '');
+  } else if(currentGame === 'snake') {
+    startSnake();
+  }
+}
+
+// VRAIE CAMÉRA BEREAL
+let streamRef = null;
+
+async function openCamera() {
+  const cameraZone = document.getElementById('cameraZone');
+  const video = document.getElementById('videoPreview');
+  cameraZone.style.display = 'block';
+  
+  try {
+    streamRef = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    video.srcObject = streamRef;
+  } catch (err) {
+    alert("Impossible d'accéder à la caméra : " + err.message);
+  }
+}
+
+function captureCamera() {
+  const video = document.getElementById('videoPreview');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 300;
+  canvas.height = video.videoHeight || 200;
+  
+  const context = canvas.getContext('2d');
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const photoData = canvas.toDataURL('image/png');
+
+  // Arrêter la caméra
+  if(streamRef) {
+    streamRef.getTracks().forEach(track => track.stop());
+  }
+  document.getElementById('cameraZone').style.display = 'none';
+
+  // Publier le BeReal
+  const checkboxes = document.querySelectorAll('#berealFriendSelect input:checked');
+  const selectedFriends = Array.from(checkboxes).map(cb => cb.value).join(', ');
+
+  const feed = document.getElementById('berealFeed');
+  const newPost = document.createElement('div');
+  newPost.className = 'post-card';
+  newPost.innerHTML = `
+    <div class="post-header">
+      <span class="avatar">🤳</span>
+      <div>
+        <strong>Moi</strong>
+        <small>Visible par : ${selectedFriends || 'Personne'}</small>
+      </div>
+    </div>
+    <div class="post-media">
+      <img src="${photoData}" class="captured-img" alt="Mon BeReal">
+    </div>
+  `;
+  feed.prepend(newPost);
+}
+
+function triggerBeRealNow() {
+  alert("⚠️ 20:00 - C'est l'heure du BeReal ! Prépare ta caméra !");
+  openCamera();
+}
+
+// TO-DO LIST
+function addTodo() {

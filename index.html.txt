@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FriendsApp - Reseau Social, Jeux & Chat</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="app-wrapper">
+    <div class="app-container">
+      
+      <header class="app-header">
+        <h1 id="headerTitle">⚡ BeReal Friends</h1>
+        <div class="user-status" id="connectionStatus">🟢 Firebase Connecté</div>
+      </header>
+
+      <main class="content">
+        
+        <section id="pageMessages" class="page-section hidden">
+          <h2>💬 Chat & Mini-Jeux Temps Réel</h2>
+          
+          <div class="card-box peer-setup">
+            <h3>🔗 Salon de Chat Direct</h3>
+            <p class="small-text">Entre un nom de salon commun avec ton ami :</p>
+            <div class="chat-input-zone">
+              <input type="text" id="roomInput" placeholder="Ex: salon123" value="general">
+              <button class="btn-primary" onclick="joinRoom()">Rejoindre</button>
+            </div>
+          </div>
+
+          <div class="chat-box" id="chatBox">
+            <div class="message received">Bienvenue dans le chat Firebase ! Tape un message.</div>
+          </div>
+
+          <div class="chat-input-zone">
+            <input type="text" id="msgInput" placeholder="Écris un message...">
+            <button class="btn-primary" onclick="sendMessage()">Envoyer</button>
+          </div>
+
+          <div class="card-box">
+            <h3>🎮 Choisir un Mini-Jeu Duo</h3>
+            <div class="game-selector">
+              <button class="btn-secondary active" onclick="selectGame('morpion')">❌ Morpion</button>
+              <button class="btn-secondary" onclick="selectGame('p4')">🔴 Puissance 4</button>
+              <button class="btn-secondary" onclick="selectGame('snake')">🐍 Snake Duo</button>
+            </div>
+          </div>
+
+          <div class="game-container">
+            <p class="game-status" id="gameStatus">Morpion interactif</p>
+            
+            <div id="gameMorpion" class="game-view">
+              <div class="tic-tac-toe" id="boardMorpion">
+                <button class="cell" onclick="playMorpion(0)"></button>
+                <button class="cell" onclick="playMorpion(1)"></button>
+                <button class="cell" onclick="playMorpion(2)"></button>
+                <button class="cell" onclick="playMorpion(3)"></button>
+                <button class="cell" onclick="playMorpion(4)"></button>
+                <button class="cell" onclick="playMorpion(5)"></button>
+                <button class="cell" onclick="playMorpion(6)"></button>
+                <button class="cell" onclick="playMorpion(7)"></button>
+                <button class="cell" onclick="playMorpion(8)"></button>
+              </div>
+            </div>
+
+            <div id="gameP4" class="game-view hidden">
+              <div class="p4-grid" id="boardP4"></div>
+            </div>
+
+            <div id="gameSnake" class="game-view hidden">
+              <canvas id="snakeCanvas" width="240" height="240"></canvas>
+              <div class="touch-controls">
+                <button onclick="changeSnakeDir('UP')">⬆️</button>
+                <div>
+                  <button onclick="changeSnakeDir('LEFT')">⬅️</button>
+                  <button onclick="changeSnakeDir('DOWN')">⬇️</button>
+                  <button onclick="changeSnakeDir('RIGHT')">➡️</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-secondary" style="margin-top: 10px;" onclick="resetCurrentGame()">Réinitialiser le jeu</button>
+          </div>
+        </section>
+
+        <section id="pageBeReal" class="page-section">
+          <div class="bereal-banner">
+            ⏰ <strong>BeReal 20:00</strong>
+            <button class="btn-small" onclick="triggerBeRealNow()">📸 Prendre Photo</button>
+          </div>
+
+          <div class="card-box" id="cameraZone" style="display:none;">
+            <h3>📸 Capture Caméra Directe</h3>
+            <video id="videoPreview" autoplay playsinline style="width:100%; border-radius:10px; background:#000;"></video>
+            <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="captureCamera()">Prendre le cliché</button>
+          </div>
+          
+          <div class="card-box">
+            <h3>📸 Poster ton BeReal</h3>
+            <p class="small-text">Amis autorisés à voir ce BeReal :</p>
+            <div class="friend-checkboxes" id="berealFriendSelect">
+              <label><input type="checkbox" value="Alex" checked> Alex</label>
+              <label><input type="checkbox" value="Léa" checked> Léa</label>
+              <label><input type="checkbox" value="Sami"> Sami</label>
+            </div>
+            <button class="btn-primary" style="margin-top: 8px; width: 100%;" onclick="openCamera()">Activer la Caméra</button>
+          </div>
+
+          <div id="berealFeed">
+            <div class="post-card">
+              <div class="post-header">
+                <span class="avatar">👨‍💻</span>
+                <div>
+                  <strong>Alex</strong>
+                  <small>Visible par : Toi, Léa</small>
+                </div>
+              </div>
+              <div class="post-media">
+                <div class="main-photo">📷 [Session Gaming]</div>
+                <div class="front-photo">🤳 [Selfie]</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="pageAmis" class="page-section hidden">
+          <h2>🤝 Amis & Confidentialité</h2>
+
+          <div class="card-box">
+            <h3>🔒 Personnaliser la visibilité de tes amis</h3>
+            <div class="friend-permissions">
+              <div class="friend-perm-item">
+                <strong>👤 Alex</strong>
+                <div class="perm-options">
+                  <label><input type="checkbox" checked> Voir BeReal</label>
+                  <label><input type="checkbox" checked> Voir mes Pseudos Jeux</label>
+                  <label><input type="checkbox" checked> To-Do List commune</label>
+                </div>
+              </div>
+              <div class="friend-perm-item">
+                <strong>👤 Sami</strong>
+                <div class="perm-options">
+                  <label><input type="checkbox"> Voir BeReal</label>
+                  <label><input type="checkbox" checked> Voir mes Pseudos Jeux</label>
+                  <label><input type="checkbox"> To-Do List commune</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <h3>📝 To-Do List partagée avec Alex</h3>
+            <div class="todo-input-zone">
+              <input type="text" id="todoInput" placeholder="Ajouter une tâche à deux...">
+              <button class="btn-primary" onclick="addTodo()">+</button>
+            </div>
+            <ul class="todo-list" id="todoList">
+              <li><input type="checkbox" onchange="toggleTodo(this)"> Gang de Brawl Stars à 18h</li>
+              <li><input type="checkbox" onchange="toggleTodo(this)"> Finir le projet GitHub</li>
+            </ul>
+          </div>
+        </section>
+
+      </main>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn" onclick="switchPage('messages')">💬 Chat/Jeux</button>
+        <button class="nav-btn active" onclick="switchPage('bereal')">📸 BeReal</button>
+        <button class="nav-btn" onclick="switchPage('amis')">👥 Profil & Amis</button>
+      </nav>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
